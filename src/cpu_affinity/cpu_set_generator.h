@@ -46,7 +46,7 @@ namespace pos
 {
 enum class CoreType
 {
-    REACTOR = 0,
+    HOST_REACTOR = 0,
     UDD_IO_WORKER,
     EVENT_SCHEDULER,
     EVENT_WORKER,
@@ -56,6 +56,7 @@ enum class CoreType
     META_IO,
     AIR,
     EVENT_REACTOR,
+    IO_REACTOR,
     COUNT,
 };
 

@@ -60,7 +60,7 @@ PovertyCpuSetGenerator::PovertyCpuSetGenerator(
 
         _AddCoreSet(startCore, 1, &nextCore, type);
 
-        if (type == CoreType::REACTOR)
+        if (type == CoreType::HOST_REACTOR)
         {
             startCore = nextCore;
         }

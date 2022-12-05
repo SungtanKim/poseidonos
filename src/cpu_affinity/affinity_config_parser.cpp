@@ -46,7 +46,7 @@ const bool AffinityConfigParser::DEFAULT_IS_STRING_DESCRIPTED = true;
 
 const CoreDescriptionArray AffinityConfigParser::DEFAULT_CORE_DESCRIPTIONS =
     {
-        CoreDescription{CoreType::REACTOR, {1, 0}, "0"},
+        CoreDescription{CoreType::HOST_REACTOR, {1, 0}, "0"},
         CoreDescription{CoreType::UDD_IO_WORKER, {1, 0}, "1"},
         CoreDescription{CoreType::EVENT_SCHEDULER, {1, 0}, "2"},
         CoreDescription{CoreType::EVENT_WORKER, {3, 0}, "3-5"},
@@ -56,12 +56,13 @@ const CoreDescriptionArray AffinityConfigParser::DEFAULT_CORE_DESCRIPTIONS =
         CoreDescription{CoreType::META_IO, {2, 0}, "9-10"},
         CoreDescription{CoreType::AIR, {1, 0}, "11"},
         CoreDescription{CoreType::EVENT_REACTOR, {3, 0}, "3-5"},
+        CoreDescription{CoreType::IO_REACTOR, {1, 0}, "2"},
 };
 
 const AffinityConfigParser::ConfigKeyAndCoreTypes
     AffinityConfigParser::CONFIG_KEY_AND_CORE_TYPES =
         {
-            ConfigKeyAndCoreType{CoreType::REACTOR, "reactor"},
+            ConfigKeyAndCoreType{CoreType::HOST_REACTOR, "host_reactor"},
             ConfigKeyAndCoreType{CoreType::UDD_IO_WORKER, "udd_io_worker"},
             ConfigKeyAndCoreType{CoreType::EVENT_SCHEDULER, "event_scheduler"},
             ConfigKeyAndCoreType{CoreType::EVENT_WORKER, "event_worker"},
@@ -71,6 +72,7 @@ const AffinityConfigParser::ConfigKeyAndCoreTypes
             ConfigKeyAndCoreType{CoreType::META_IO, "meta_io"},
             ConfigKeyAndCoreType{CoreType::AIR, "air"},
             ConfigKeyAndCoreType{CoreType::EVENT_REACTOR, "event_reactor"},
+            ConfigKeyAndCoreType{CoreType::IO_REACTOR, "io_reactor"},
 };
 
 AffinityConfigParser::AffinityConfigParser(ConfigManager& configManager_)
@@ -132,7 +134,8 @@ AffinityConfigParser::AffinityConfigParser(ConfigManager& configManager_)
             useAffinity = false;
         }
         if (useReactorConfig == false &&
-            ((iter.type == CoreType::EVENT_REACTOR)))
+            ((iter.type == CoreType::EVENT_REACTOR) ||
+            (iter.type == CoreType::IO_REACTOR)))
         {
             useAffinity = false;
         }

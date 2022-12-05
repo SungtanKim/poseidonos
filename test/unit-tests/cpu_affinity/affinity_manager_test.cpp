@@ -17,7 +17,7 @@ namespace pos
 {
 const CoreDescriptionArray TEST_CORE_DESCRIPTIONS =
     {
-        CoreDescription{CoreType::REACTOR, {1, 0}, "0"},
+        CoreDescription{CoreType::HOST_REACTOR, {1, 0}, "0"},
         CoreDescription{CoreType::UDD_IO_WORKER, {1, 0}, "1"},
         CoreDescription{CoreType::EVENT_SCHEDULER, {1, 0}, "2"},
         CoreDescription{CoreType::EVENT_WORKER, {3, 0}, "3-5"},
@@ -92,10 +92,10 @@ TEST(AffinityManager, GetReactorCPUSetString_ReturnReactorBitString)
 {
     // Given : Set CpuSet(reactor : 0x2)
     CpuSetArray cpuArray;
-    CPU_ZERO(&cpuArray[static_cast<uint32_t>(CoreType::REACTOR)]);
+    CPU_ZERO(&cpuArray[static_cast<uint32_t>(CoreType::HOST_REACTOR)]);
     CPU_ZERO(&cpuArray[static_cast<uint32_t>(CoreType::EVENT_REACTOR)]);
-    CPU_SET(0, &cpuArray[static_cast<uint32_t>(CoreType::REACTOR)]);
-    CPU_SET(1, &cpuArray[static_cast<uint32_t>(CoreType::REACTOR)]);
+    CPU_SET(0, &cpuArray[static_cast<uint32_t>(CoreType::HOST_REACTOR)]);
+    CPU_SET(1, &cpuArray[static_cast<uint32_t>(CoreType::HOST_REACTOR)]);
     AffinityManager affinityManager(8, cpuArray);
 
     // When : call GetReactorCPUSetString
@@ -111,9 +111,9 @@ TEST(AffinityManager, GetMasterReactorCore_ReturnValidCore)
 {
     // Given : Set CpuSet(reactor : 0x2)
     CpuSetArray cpuArray;
-    CPU_ZERO(&cpuArray[static_cast<uint32_t>(CoreType::REACTOR)]);
-    CPU_SET(0, &cpuArray[static_cast<uint32_t>(CoreType::REACTOR)]);
-    CPU_SET(1, &cpuArray[static_cast<uint32_t>(CoreType::REACTOR)]);
+    CPU_ZERO(&cpuArray[static_cast<uint32_t>(CoreType::HOST_REACTOR)]);
+    CPU_SET(0, &cpuArray[static_cast<uint32_t>(CoreType::HOST_REACTOR)]);
+    CPU_SET(1, &cpuArray[static_cast<uint32_t>(CoreType::HOST_REACTOR)]);
     AffinityManager affinityManager(8, cpuArray);
 
     // When : call GetMasterReactorCore
@@ -128,7 +128,7 @@ TEST(AffinityManager, GetMasterReactorCore_ReturnInvalidCore)
 {
     // Given : Set CpuSet(reactor)
     CpuSetArray cpuArray;
-    CPU_ZERO(&cpuArray[static_cast<uint32_t>(CoreType::REACTOR)]);
+    CPU_ZERO(&cpuArray[static_cast<uint32_t>(CoreType::HOST_REACTOR)]);
     AffinityManager affinityManager(8, cpuArray);
 
     // When : call GetMasterReactorCore

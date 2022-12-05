@@ -151,9 +151,9 @@ SpdkNvmfCaller::SpdkNvmfInitializeNumaAwarePollGroup(void)
 }
 
 void
-SpdkNvmfCaller::SpdkNvmfSetUseEventReactor(cpu_set_t eventReactorSet)
+SpdkNvmfCaller::SpdkNvmfSetUseNonHostReactor(cpu_set_t nonHostReactorSet)
 {
-    spdk_nvmf_set_use_event_reactor(eventReactorSet);
+    spdk_nvmf_set_use_non_host_reactor(nonHostReactorSet);
 }
 
 } // namespace pos

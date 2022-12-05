@@ -9,7 +9,7 @@ TEST(StringDescriptedCpuSetGenerator, StringDescriptedCpuSetGenerator_Stack_NonM
     // Given
     const CoreDescriptionArray TEST_CORE_DESCRIPTIONS =
         {
-            CoreDescription{CoreType::REACTOR, {1, 0}, "0"},
+            CoreDescription{CoreType::HOST_REACTOR, {1, 0}, "0"},
             CoreDescription{CoreType::UDD_IO_WORKER, {1, 0}, "1"},
             CoreDescription{CoreType::EVENT_SCHEDULER, {1, 0}, "2"},
             CoreDescription{CoreType::EVENT_WORKER, {3, 0}, "3-5"},
@@ -27,7 +27,7 @@ TEST(StringDescriptedCpuSetGenerator, StringDescriptedCpuSetGenerator_Heap_Mask)
     // Given
     const CoreDescriptionArray TEST_CORE_DESCRIPTIONS =
         {
-            CoreDescription{CoreType::REACTOR, {1, 0}, "0x0"},
+            CoreDescription{CoreType::HOST_REACTOR, {1, 0}, "0x0"},
             CoreDescription{CoreType::UDD_IO_WORKER, {1, 0}, "0x111"},
             CoreDescription{CoreType::EVENT_SCHEDULER, {1, 0}, "2"},
             CoreDescription{CoreType::EVENT_WORKER, {3, 0}, "3-5"},

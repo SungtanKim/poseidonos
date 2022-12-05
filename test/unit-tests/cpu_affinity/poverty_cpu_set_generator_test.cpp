@@ -6,7 +6,7 @@ namespace pos
 {
 const CoreDescriptionArray TEST_CORE_DESCRIPTIONS =
     {
-        CoreDescription{CoreType::REACTOR, {1, 0}, "0"},
+        CoreDescription{CoreType::HOST_REACTOR, {1, 0}, "0"},
         CoreDescription{CoreType::UDD_IO_WORKER, {1, 0}, "1"},
         CoreDescription{CoreType::EVENT_SCHEDULER, {1, 0}, "2"},
         CoreDescription{CoreType::EVENT_WORKER, {3, 0}, "3-5"},

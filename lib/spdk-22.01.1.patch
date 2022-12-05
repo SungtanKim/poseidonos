@@ -419,10 +419,10 @@ index 000000000..35b3df73b
 +#endif /* SPDK_POS_APP_H_ */
 diff --git include/spdk/pos_nvmf.h include/spdk/pos_nvmf.h
 new file mode 100644
-index 000000000..652176410
+index 000000000..b376de661
 --- /dev/null
 +++ include/spdk/pos_nvmf.h
-@@ -0,0 +1,122 @@
+@@ -0,0 +1,123 @@
 +/*-
 + *   BSD LICENSE
 + *
@@ -527,7 +527,7 @@ index 000000000..652176410
 +int spdk_nvmf_subsystem_set_pause_state_directly(struct spdk_nvmf_subsystem *subsystem);
 +
 +void
-+spdk_nvmf_set_use_event_reactor(cpu_set_t event_reactor_set);
++spdk_nvmf_set_use_non_host_reactor(cpu_set_t event_reactor_set);
 +
 +void spdk_nvmf_initialize_numa_aware_poll_group(void);
 +
@@ -545,6 +545,7 @@ index 000000000..652176410
 +#endif
 +
 +#endif /* SPDK_POS_NVMF_H_ */
++ 
 diff --git include/spdk/pos_thread.h include/spdk/pos_thread.h
 new file mode 100644
 index 000000000..71e3e0611
@@ -1332,10 +1333,10 @@ index e5842b03f..1ad89d7db 100644
  	const struct spdk_nvme_transport_id *trid);
 diff --git lib/nvmf/pos_nvmf.c lib/nvmf/pos_nvmf.c
 new file mode 100644
-index 000000000..0bfb871a9
+index 000000000..28e82842b
 --- /dev/null
 +++ lib/nvmf/pos_nvmf.c
-@@ -0,0 +1,270 @@
+@@ -0,0 +1,271 @@
 +/*
 + *   BSD LICENSE
 + *   Copyright (c) 2021 Samsung Electronics Corporation
@@ -1507,13 +1508,13 @@ index 000000000..0bfb871a9
 +static int groups_ptr[M_MAX_NUMA]= {0, };
 +static bool numa_dedicated_config = false;
 +static bool use_reactor_only = false;
-+static cpu_set_t event_reactor_core;
++static cpu_set_t non_host_reactor_core;
 +
 +void
-+spdk_nvmf_set_use_event_reactor(cpu_set_t event_reactor_set)
++spdk_nvmf_set_use_non_host_reactor(cpu_set_t non_host_reactor_set)
 +{
 +	use_reactor_only = true;
-+	event_reactor_core = event_reactor_set;
++	non_host_reactor_core = non_host_reactor_set;
 +}
 +
 +void
@@ -1528,7 +1529,7 @@ index 000000000..0bfb871a9
 +{
 +	if (use_reactor_only)
 +	{
-+		if (CPU_ISSET(core, &event_reactor_core))
++		if (CPU_ISSET(core, &non_host_reactor_core))
 +		{
 +			return true;
 +		}
@@ -1606,6 +1607,7 @@ index 000000000..0bfb871a9
 +	}
 +	return target_group;
 +}
++
 diff --git lib/nvmf/rdma.c lib/nvmf/rdma.c
 index 819638725..573a968d8 100644
 --- lib/nvmf/rdma.c

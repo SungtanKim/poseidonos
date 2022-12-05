@@ -48,7 +48,7 @@ public:
 private:
     enum Role
     {
-        REACTOR = 0,
+        HOST_REACTOR = 0,
         NONE,
         EVENT,
         USER_IO,
@@ -58,6 +58,7 @@ private:
         META_IO,
         QOS,
         AIR,
+        IO_REACTOR,
         EVENT_REACTOR,
         ROLE_COUNT,
     };
@@ -106,7 +107,7 @@ private:
         std::vector<Socket> sockets;
         AffinityManager& affinityManager;
 
-        void _RegisterReactorCpu(void);
+        void _RegisterHostReactorCpu(void);
         void _RegisterQoSCpu(void);
         void _RegisterEventCpu(void);
         void _RegisterUserIoCpu(void);
@@ -115,6 +116,7 @@ private:
         void _RegisterMetaSchedulerCpu(void);
         void _RegisterMetaCpu(void);
         void _RegisterAirCpu(void);
+        void _RegisterIoReactorCpu(void);
         void _RegisterEventReactorCpu(void);
         void _RegisterCpuRole(int cpuId, Role role);
         void _RegisterCpuSetRole(cpu_set_t cpuSet, Role role);

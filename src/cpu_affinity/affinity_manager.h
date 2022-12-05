@@ -60,6 +60,7 @@ public:
     uint32_t GetCoreCount(CoreType type);
     virtual uint32_t GetNumaCount(void);
     virtual bool UseEventReactor();
+    virtual bool IsHostReactor(uint32_t reactor);
     virtual bool IsEventReactor(uint32_t reactor);
     virtual bool IsIoReactor(uint32_t reactor);
 

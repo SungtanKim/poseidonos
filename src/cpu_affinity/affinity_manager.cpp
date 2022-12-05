@@ -112,7 +112,11 @@ AffinityManager::AffinityManager(AffinityConfigParser* parser_)
         if (parser->UseEventReactor())
         {
             SpdkNvmfCaller spdkNvmfCaller;
-            spdkNvmfCaller.SpdkNvmfSetUseEventReactor(cpuSetArray[(static_cast<uint32_t>(CoreType::EVENT_REACTOR))]);
+            cpu_set_t nonHostReactorSet;
+            cpu_set_t ioReactorSet = cpuSetArray[(static_cast<uint32_t>(CoreType::IO_REACTOR))];
+            cpu_set_t eventReactorSet = cpuSetArray[(static_cast<uint32_t>(CoreType::EVENT_REACTOR))];
+            CPU_OR(&nonHostReactorSet, &ioReactorSet, &eventReactorSet);
+            spdkNvmfCaller.SpdkNvmfSetUseNonHostReactor(nonHostReactorSet);
         }
     }
     catch (...)
@@ -233,7 +237,7 @@ AffinityManager::GetEventWorkerSocket(void)
 std::string
 AffinityManager::GetReactorCPUSetString(void)
 {
-    cpu_set_t reactorCpuSet = GetCpuSet(CoreType::REACTOR);
+    cpu_set_t reactorCpuSet = GetCpuSet(CoreType::HOST_REACTOR);
     cpu_set_t totalReactorCpuSet;
     CPU_ZERO(&totalReactorCpuSet);
     CPU_OR(&totalReactorCpuSet, &reactorCpuSet, &totalReactorCpuSet);
@@ -241,6 +245,8 @@ AffinityManager::GetReactorCPUSetString(void)
     {
         cpu_set_t eventReactorCpuSet = GetCpuSet(CoreType::EVENT_REACTOR);
         CPU_OR(&totalReactorCpuSet, &eventReactorCpuSet, &totalReactorCpuSet);
+        cpu_set_t ioReactorCpuSet = GetCpuSet(CoreType::IO_REACTOR);
+        CPU_OR(&totalReactorCpuSet, &ioReactorCpuSet, &totalReactorCpuSet);
     }
     string cpuString = _GetCPUSetString(totalReactorCpuSet);
     return cpuString;
@@ -292,7 +298,7 @@ AffinityManager::_GetCPUSetString(cpu_set_t cpuSet)
 uint32_t
 AffinityManager::GetMasterReactorCore(void)
 {
-    cpu_set_t reactorCpuSet = GetCpuSet(CoreType::REACTOR);
+    cpu_set_t reactorCpuSet = GetCpuSet(CoreType::HOST_REACTOR);
     uint32_t totalCoreCount = GetTotalCore();
     for (uint32_t cpu = 0; cpu < totalCoreCount; cpu++)
     {
@@ -338,6 +344,17 @@ AffinityManager::UseEventReactor(void)
 }
 
 bool
+AffinityManager::IsHostReactor(uint32_t reactor)
+{
+    cpu_set_t eventReactorCpuSet = GetCpuSet(CoreType::HOST_REACTOR);
+    if (CPU_ISSET(reactor, &eventReactorCpuSet))
+    {
+        return true;
+    }
+    return false;
+}
+
+bool
 AffinityManager::IsEventReactor(uint32_t reactor)
 {
     cpu_set_t eventReactorCpuSet = GetCpuSet(CoreType::EVENT_REACTOR);
@@ -351,7 +368,7 @@ AffinityManager::IsEventReactor(uint32_t reactor)
 bool
 AffinityManager::IsIoReactor(uint32_t reactor)
 {
-    cpu_set_t ioReactorCpuSet = GetCpuSet(CoreType::REACTOR);
+    cpu_set_t ioReactorCpuSet = GetCpuSet(CoreType::IO_REACTOR);
     if (CPU_ISSET(reactor, &ioReactorCpuSet))
     {
         return true;

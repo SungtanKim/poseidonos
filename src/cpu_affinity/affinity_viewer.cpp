@@ -43,7 +43,7 @@ namespace pos
 {
 const char* AffinityViewer::Cpu::ROLE_DESCRIPTIONS[ROLE_COUNT] =
     {
-        "Reactor",
+        "HostReactor",
         "None",
         "Event",
         "UserIO",
@@ -53,6 +53,7 @@ const char* AffinityViewer::Cpu::ROLE_DESCRIPTIONS[ROLE_COUNT] =
         "MetaIO",
         "QOS",
         "AIR",
+        "IoReactor",
         "EventReactor"};
 
 AffinityViewer::Socket::Socket(void)
@@ -161,10 +162,10 @@ AffinityViewer::Numa::Numa(AffinityManager* affinityManager)
 }
 
 void
-AffinityViewer::Numa::_RegisterReactorCpu(void)
+AffinityViewer::Numa::_RegisterHostReactorCpu(void)
 {
-    cpu_set_t reactorCpuSet = affinityManager.GetCpuSet(CoreType::REACTOR);
-    _RegisterCpuSetRole(reactorCpuSet, REACTOR);
+    cpu_set_t reactorCpuSet = affinityManager.GetCpuSet(CoreType::HOST_REACTOR);
+    _RegisterCpuSetRole(reactorCpuSet, HOST_REACTOR);
 }
 
 void
@@ -259,9 +260,17 @@ AffinityViewer::Numa::_RegisterEventReactorCpu(void)
 }
 
 void
+AffinityViewer::Numa::_RegisterIoReactorCpu(void)
+{
+    cpu_set_t eventReactorCpuSet =
+        affinityManager.GetCpuSet(CoreType::IO_REACTOR);
+    _RegisterCpuSetRole(eventReactorCpuSet, IO_REACTOR);
+}
+
+void
 AffinityViewer::Numa::RegisterEveryCpuRole(void)
 {
-    _RegisterReactorCpu();
+    _RegisterHostReactorCpu();
     _RegisterEventCpu();
     _RegisterUserIoCpu();
     _RegisterSchedulerCpu();
@@ -270,6 +279,7 @@ AffinityViewer::Numa::RegisterEveryCpuRole(void)
     _RegisterMetaCpu();
     _RegisterQoSCpu();
     _RegisterAirCpu();
+    _RegisterIoReactorCpu();
     _RegisterEventReactorCpu();
 }
 
