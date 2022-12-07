@@ -57,19 +57,7 @@ std::atomic<int64_t> StateObserverForIO::countOfRebuildingArrays;
 
 IODispatcherSubmission::IODispatcherSubmission(void)
 {
-    ioReactorCount = 0;
-    for (uint32_t coreIndex = 0; coreIndex < MAX_CORE; coreIndex++)
-    {
-        ioReactorCore[coreIndex] = 0;
-    }
-    for (uint32_t coreIndex = 0; coreIndex < MAX_CORE; coreIndex++)
-    {
-        if (AffinityManagerSingleton::Instance()->IsIoReactor(coreIndex))
-        {
-            ioReactorCore[ioReactorCount] = coreIndex;
-            ioReactorCount++;
-        }
-    }
+    affinityMgr = AffinityManagerSingleton::Instance();
     for (uint32_t event = 0; event < BackendEvent_Count; event++)
     {
         scheduler[event].schedType = SchedulingType::NoMatter;
@@ -174,7 +162,7 @@ IODispatcherSubmission::SubmitIOInReactor(UBlockDevice* ublock, UbioSmartPtr ubi
     SchedulingType schedType = scheduler[eventType].schedType;
     uint32_t lastIndex = lastIndexCommon;
     uint64_t reactorStart = 0;
-    uint64_t reactorCount = ioReactorCount;
+    uint64_t reactorCount = affinityMgr->GetIoReactorCount();
     if (_IsReactorScheduledNeeded(schedType) == true)
     {
         lastIndex = scheduler[eventType].lastIndex;
@@ -182,7 +170,7 @@ IODispatcherSubmission::SubmitIOInReactor(UBlockDevice* ublock, UbioSmartPtr ubi
         reactorCount = scheduler[eventType].reactorCount;
     }
 
-    uint32_t targetReactorCore = ioReactorCore[lastIndex];
+    uint32_t targetReactorCore = affinityMgr->GetIoReactor(lastIndex);
 
     if (ubio->GetOriginCore() == INVALID_CORE)
     {
@@ -238,13 +226,13 @@ IODispatcherSubmission::UpdateReactorRatio(void)
             // To avoid reactor Count is zero, We need to set sched type as "no matter".
             _SetSchedType((BackendEvent)event, SchedulingType::NoMatter);
             scheduler[event].reactorStart = currentStartReactor;
-            uint32_t reactorCountForEvent = scheduler[event].reactorRatio * ioReactorCount / totalReactorRatio;
+            uint32_t reactorCountForEvent = scheduler[event].reactorRatio * affinityMgr->GetIoReactorCount() / totalReactorRatio;
             scheduler[event].reactorCount = reactorCountForEvent;
             currentStartReactor += reactorCountForEvent;
             lastEventWithRatioSet = event;
         }
     }
-    scheduler[lastEventWithRatioSet].reactorCount = ioReactorCount - scheduler[lastEventWithRatioSet].reactorStart;
+    scheduler[lastEventWithRatioSet].reactorCount = affinityMgr->GetIoReactorCount() - scheduler[lastEventWithRatioSet].reactorStart;
     _SetSchedType(BackendEvent_FrontendIO, SchedulingType::ReactorRatio);
     _SetSchedType(BackendEvent_UserdataRebuild, SchedulingType::ReactorRatioAndThrottling);
 }

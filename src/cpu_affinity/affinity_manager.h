@@ -63,6 +63,8 @@ public:
     virtual bool IsHostReactor(uint32_t reactor);
     virtual bool IsEventReactor(uint32_t reactor);
     virtual bool IsIoReactor(uint32_t reactor);
+    uint32_t GetIoReactor(uint32_t index);
+    uint32_t GetIoReactorCount(void);
 
 private:
     static const uint32_t MAX_NUMA_COUNT = RTE_MAX_NUMA_NODES;
@@ -78,7 +80,10 @@ private:
 
     void _SetNumaInformation(const CoreDescriptionArray& descArray);
     bool _IsCoreSufficient(void);
+    static const uint32_t MAX_CORE = 128;
+    uint32_t ioReactorCore[MAX_CORE], ioReactorCount = 0;
     std::string _GetCPUSetString(cpu_set_t cpuSet);
+    void _InitIoReactor(void);
     static thread_local uint32_t numaId;
 };
 

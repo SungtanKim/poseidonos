@@ -117,6 +117,7 @@ AffinityManager::AffinityManager(AffinityConfigParser* parser_)
             cpu_set_t eventReactorSet = cpuSetArray[(static_cast<uint32_t>(CoreType::EVENT_REACTOR))];
             CPU_OR(&nonHostReactorSet, &ioReactorSet, &eventReactorSet);
             spdkNvmfCaller.SpdkNvmfSetUseNonHostReactor(nonHostReactorSet);
+            _InitIoReactor();
         }
     }
     catch (...)
@@ -374,6 +375,41 @@ AffinityManager::IsIoReactor(uint32_t reactor)
         return true;
     }
     return false;
+}
+
+void
+AffinityManager::_InitIoReactor(void)
+{
+    ioReactorCount = 0;
+    for (uint32_t coreIndex = 0; coreIndex < MAX_CORE; coreIndex++)
+    {
+        ioReactorCore[coreIndex] = 0;
+    }
+    for (uint32_t coreIndex = 0; coreIndex < MAX_CORE; coreIndex++)
+    {
+        if (IsIoReactor(coreIndex))
+        {
+            ioReactorCore[ioReactorCount] = coreIndex;
+            ioReactorCount++;
+        }
+    }
+}
+
+uint32_t
+AffinityManager::GetIoReactor(uint32_t index)
+{
+    if (unlikely(ioReactorCount == 0))
+    {
+        POS_EVENT_ID eventId = EID(AFTMGR_CPU_COUNT_NOT_ENOUGH);
+        POS_TRACE_ERROR(eventId, "IO Reactor's Count is zero");
+    }
+    return ioReactorCore[index];
+}
+
+uint32_t
+AffinityManager::GetIoReactorCount(void)
+{
+    return ioReactorCount;
 }
 
 } // namespace pos

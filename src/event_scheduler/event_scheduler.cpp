@@ -99,19 +99,6 @@ EventScheduler::EventScheduler(QosManager* qosManagerArg,
     totalWorkerIDVector.clear();
     ioDispatcher = nullptr;
     terminateStarted = false;
-    ioReactorCount = 0;
-    for (uint32_t coreIndex = 0; coreIndex < MAX_CORE; coreIndex++)
-    {
-        ioReactorCore[coreIndex] = 0;
-    }
-    for (uint32_t coreIndex = 0; coreIndex < MAX_CORE; coreIndex++)
-    {
-        if (AffinityManagerSingleton::Instance()->IsIoReactor(coreIndex))
-        {
-            ioReactorCore[ioReactorCount] = coreIndex;
-            ioReactorCount++;
-        }
-    }
 }
 
 EventScheduler::~EventScheduler(void)
@@ -190,7 +177,7 @@ EventScheduler::EnqueueEvent(EventSmartPtr input)
         static std::atomic<uint32_t> lastReactorIndex;
         uint32_t type = static_cast<uint32_t>(input->GetEventType());
         if (type == BackendEvent_UserdataRebuild || type == BackendEvent_MetadataRebuild ||
-            type == BackendEvent_FlushMap || type == BackendEvent_GC || type == BackendEvent_Unknown)
+            type == BackendEvent_FlushMap || type == BackendEvent_GC || type == BackendEvent_Unknown || type == BackendEvent_Flush)
         {
             type = ReactorType_SpecialEvent;
         }
@@ -199,7 +186,7 @@ EventScheduler::EnqueueEvent(EventSmartPtr input)
             type = ReactorType_IOEvent;
         }
         uint32_t coreIndex = lastReactorIndex;
-        uint32_t targetCore = ioReactorCore[coreIndex], coreCount = ioReactorCount;
+        uint32_t targetCore = affinityManager->GetIoReactor(coreIndex), coreCount = affinityManager->GetIoReactorCount();
         bool ret = false;
         if (type == ReactorType_IOEvent)
         {

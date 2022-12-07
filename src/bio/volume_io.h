@@ -81,6 +81,7 @@ public:
     virtual uint32_t GetVolumeId(void);
     void SetVolumeId(uint32_t inputVolumeId);
     bool IsPollingNecessary(void);
+    uint32_t GetHostReactor(void);
     uint32_t GetOriginCore(void) override;
     virtual void SetLsidEntry(StripeAddr& lsidEntry);
     void SetOldLsidEntry(StripeAddr& lsidEntry);
@@ -98,8 +99,8 @@ private:
     static const VirtualBlkAddr INVALID_VSA;
     static const uint64_t INVALID_RBA;
 
+    uint32_t hostReactor;
     uint32_t volumeId;
-    uint32_t originCore;
     StripeAddr lsidEntry;
     StripeAddr oldLsidEntry;
     VirtualBlkAddr vsa;

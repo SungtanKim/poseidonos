@@ -119,8 +119,6 @@ AffinityConfigParser::AffinityConfigParser(ConfigManager& configManager_)
         POS_EVENT_ID eventId = EID(AFTMGR_USE_CONFIG);
         POS_TRACE_INFO(static_cast<uint32_t>(eventId),
             "Use reactors for backend events and IOs.");
-        POS_TRACE_INFO(static_cast<uint32_t>(eventId),
-            "Event Reactor is not implemented yet, fallback to legacy code");
     }
     std::vector<bool> mandatoryAffinityVector;
     for (auto& iter : CONFIG_KEY_AND_CORE_TYPES)

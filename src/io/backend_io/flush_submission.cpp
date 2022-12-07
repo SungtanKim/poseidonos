@@ -71,7 +71,7 @@ FlushSubmission::FlushSubmission(Stripe* inputStripe, IIOSubmitHandler* ioSubmit
   isWTEnabled(isWTEnabled)
 {
     SetEventType(BackendEvent_Flush);
-
+    airlog("Pending_Flush", "internal", arrayId, 1);
     if (arrayInfo == nullptr)
     {
         POS_TRACE_ERROR(EID(ARRAY_MGR_NO_ARRAY_MATCHING_REQ_ID), "Failed to retrieve array information for array id {}.", arrayId);
@@ -115,7 +115,6 @@ FlushSubmission::_DoSpecificJob(void)
         .blkCnt = 1};
 
     FlushCountSingleton::Instance()->pendingFlush++;
-    airlog("Pending_Flush", "internal", arrayId, 1);
 
     if (likely(translator != nullptr))
     {

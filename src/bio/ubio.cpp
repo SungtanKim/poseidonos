@@ -59,6 +59,7 @@ Ubio::Ubio(void* buffer, uint32_t unitCount, int arrayID)
 : dir(UbioDir::Read),
   ubioPrivate(nullptr),
   eventIoType(BackendEvent_Unknown),
+  originCore(INVALID_CORE),
   dataBuffer(unitCount * BYTES_PER_UNIT, buffer),
   callback(nullptr),
   syncDone(false),
@@ -68,15 +69,15 @@ Ubio::Ubio(void* buffer, uint32_t unitCount, int arrayID)
   lba(0),
   uBlock(nullptr),
   arrayDev(nullptr),
-  arrayId(arrayID),
-  originCore(INVALID_CORE)
+  arrayId(arrayID)
 {
     SetAsyncMode();
     airlog("Ubio_Constructor", "internal", GetEventType(), 1);
 }
 
 Ubio::Ubio(const Ubio& ubio)
-: dataBuffer(ubio.dataBuffer),
+: originCore(INVALID_CORE),
+  dataBuffer(ubio.dataBuffer),
   callback(nullptr),
   syncDone(false),
   retry(ubio.retry),
@@ -85,8 +86,7 @@ Ubio::Ubio(const Ubio& ubio)
   lba(0),
   uBlock(nullptr),
   arrayDev(nullptr),
-  arrayId(ubio.arrayId),
-  originCore(INVALID_CORE)
+  arrayId(ubio.arrayId)
 {
     dir = ubio.dir;
     SetAsyncMode();

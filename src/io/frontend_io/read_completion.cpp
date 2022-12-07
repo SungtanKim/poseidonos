@@ -39,6 +39,7 @@
 #include "src/include/pos_event_id.hpp"
 #include "src/lib/block_alignment.h"
 #include "src/logger/logger.h"
+#include "src/spdk_wrapper/event_framework_api.h"
 
 namespace pos
 {

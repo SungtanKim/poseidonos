@@ -45,6 +45,8 @@
 #include "src/dump/dump_module.hpp"
 #include "src/event_scheduler/callback.h"
 #include "src/include/pos_event_id.hpp"
+#include "src/spdk_wrapper/event_framework_api.h"
+#include "src/io/frontend_io/aio.h"
 
 namespace pos
 {
@@ -67,7 +69,6 @@ ReadSubmission::ReadSubmission(VolumeIoSmartPtr volumeIo, BlockAlignment* blockA
     {
         translator = new Translator{volumeIo->GetVolumeId(), blockAlignment->GetHeadBlock(), blockAlignment->GetBlockCount(), volumeIo->GetArrayId(), true};
     }
-    airlog("RequestedUserRead", "user", GetEventType(), 1);
 }
 
 ReadSubmission::~ReadSubmission()
@@ -92,6 +93,7 @@ ReadSubmission::~ReadSubmission()
 bool
 ReadSubmission::Execute(void)
 {
+    airlog("RequestedUserRead", "user", GetEventType(), 1);
     uint32_t volId = volumeIo->GetVolumeId();
     uint32_t arrayId = volumeIo->GetArrayId();
     SmartLogMgrSingleton::Instance()->IncreaseReadCmds(volId, arrayId);
@@ -109,6 +111,9 @@ ReadSubmission::Execute(void)
     }
 
     volumeIo = nullptr;
+    /*usleep(2);
+    AIO aio;
+    aio.CompleteIOs();*/
     return true;
 }
 

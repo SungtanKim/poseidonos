@@ -92,7 +92,6 @@ WriteSubmission::WriteSubmission(VolumeIoSmartPtr volumeIo, RBAStateManager* inp
   flowControl(inputFlowControl),
   volumeManager(inputVolumeManager)
 {
-    airlog("RequestedUserWrite", "user", GetEventType(), 1);
     if (nullptr == volumeManager)
     {
         volumeManager = VolumeServiceSingleton::Instance()->GetVolumeManager(volumeIo->GetArrayId());
@@ -110,8 +109,14 @@ WriteSubmission::~WriteSubmission(void)
 bool
 WriteSubmission::Execute(void)
 {
+    airlog("RequestedUserWrite", "user", GetEventType(), 1);
     try
     {
+        if (retry)
+        {
+            count++;
+            if (count < 200) return false;
+        }
         if (iBlockAllocator->IsProhibitedUserBlkAlloc() == true)
         {
             return false;
@@ -136,6 +141,8 @@ WriteSubmission::Execute(void)
         bool done = _ProcessOwnedWrite();
         if (unlikely(!done))
         {
+            retry = true;
+            count = 0;
             rbaStateManager->BulkReleaseOwnership(volumeId, startRba,
                 blockCount);
             if (0 < token)

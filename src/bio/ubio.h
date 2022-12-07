@@ -142,6 +142,7 @@ protected:
     BackendEvent eventIoType;
     void _ReflectSplit(UbioSmartPtr newUbio, uint32_t sectors,
         bool removalFromTail);
+    uint32_t originCore;
 
 private:
     static const uint64_t INVALID_LBA = UINT64_MAX;
@@ -158,7 +159,6 @@ private:
     IArrayDevice* arrayDev;
     int arrayId;
     std::string arrayName;
-    uint32_t originCore;
 
     bool CheckOriginUbioSet(void);
     void Advance(uint32_t sectors);

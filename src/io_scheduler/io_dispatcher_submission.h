@@ -32,6 +32,7 @@
 
 #pragma once
 
+#include "src/cpu_affinity/affinity_manager.h"
 #include "src/include/backend_event.h"
 #include "src/state/interface/i_state_control.h"
 #include "src/state/interface/i_state_observer.h"
@@ -105,12 +106,11 @@ private:
     static void _SubmitIOInReactor(void* ptr1, void* ptr2);
     void _SetRebuildImpact(RebuildImpact rebuildImpact);
     void _SetSchedType(BackendEvent event, SchedulingType schedType);
-    static const uint32_t MAX_CORE = 128;
-    uint32_t ioReactorCore[MAX_CORE], ioReactorCount = 0;
     static const uint64_t NO_THROTTLING_VALUE = 64 * 1024ULL * 1024ULL * 1024ULL; // 64G
     static const uint64_t SSD_REBUILD_WRITE_MAX_BW = 3500ULL * 1024ULL * 1024ULL;
     static SchedulingInIODispatcher scheduler[BackendEvent_Count];
     bool schedulingOn;
+    AffinityManager* affinityMgr;
 };
 
 using IODispatcherSubmissionSingleton = Singleton<IODispatcherSubmission>;

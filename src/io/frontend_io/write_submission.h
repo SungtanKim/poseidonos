@@ -100,5 +100,7 @@ private:
     VirtualBlkAddrInfo _PopTailVsa(void);
     void _SetupVolumeIo(VolumeIoSmartPtr newVolumeIo, VirtualBlksInfo& virtualBlksInfo,
         CallbackSmartPtr callback);
+    bool retry = false;
+    uint32_t count = 0;
 };
 } // namespace pos

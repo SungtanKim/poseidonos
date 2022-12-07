@@ -58,7 +58,6 @@ VolumeIo::VolumeIo(void* buffer, uint32_t unitCount, int arrayId)
 VolumeIo::VolumeIo(void* buffer, uint32_t unitCount, int arrayId, IVolumeInfoManager* inputVolumeManager)
 : Ubio(buffer, unitCount, arrayId),
   volumeId(MAX_VOLUME_COUNT),
-  originCore(EventFrameworkApiSingleton::Instance()->GetCurrentReactor()),
   lsidEntry(INVALID_LSID_ENTRY),
   oldLsidEntry(INVALID_LSID_ENTRY),
   vsa(INVALID_VSA),
@@ -66,6 +65,8 @@ VolumeIo::VolumeIo(void* buffer, uint32_t unitCount, int arrayId, IVolumeInfoMan
   stripeId(UNMAP_STRIPE),
   volumeManager(inputVolumeManager)
 {
+    hostReactor = EventFrameworkApiSingleton::Instance()->GetCurrentReactor();
+    originCore = INVALID_CORE;
     if (nullptr == volumeManager)
     {
         volumeManager = VolumeServiceSingleton::Instance()->GetVolumeManager(arrayId);
@@ -75,7 +76,6 @@ VolumeIo::VolumeIo(void* buffer, uint32_t unitCount, int arrayId, IVolumeInfoMan
 VolumeIo::VolumeIo(const VolumeIo& volumeIo)
 : Ubio(volumeIo),
   volumeId(volumeIo.volumeId),
-  originCore(volumeIo.originCore),
   lsidEntry(INVALID_LSID_ENTRY),
   oldLsidEntry(INVALID_LSID_ENTRY),
   vsa(INVALID_VSA),
@@ -83,6 +83,8 @@ VolumeIo::VolumeIo(const VolumeIo& volumeIo)
   stripeId(UNMAP_STRIPE),
   volumeManager(volumeIo.volumeManager)
 {
+    hostReactor = volumeIo.hostReactor;
+    originCore = volumeIo.originCore;
 }
 
 VolumeIo::~VolumeIo(void)
@@ -202,6 +204,12 @@ VolumeIo::GetOriginCore(void)
     }
 
     return originCore;
+}
+
+uint32_t
+VolumeIo::GetHostReactor(void)
+{
+    return hostReactor;
 }
 
 void

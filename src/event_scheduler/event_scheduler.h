@@ -112,9 +112,6 @@ private:
     AffinityManager* affinityManager;
     IIODispatcher* ioDispatcher;
     std::atomic<bool> terminateStarted;
-    static const uint32_t MAX_CORE = 128;
-    uint32_t ioReactorCore[MAX_CORE];
-    uint32_t ioReactorCount = 0;
 };
 
 using EventSchedulerSingleton = Singleton<EventScheduler>;

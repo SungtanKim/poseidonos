@@ -121,14 +121,13 @@ bool
 AioCompletion::_DoSpecificJob(void)
 {
     uint32_t originCore;
-
     if (posIo.ioType == IO_TYPE::FLUSH)
     {
         originCore = flushIo->GetOriginCore();
     }
     else
     {
-        originCore = volumeIo->GetOriginCore();
+        originCore = volumeIo->GetHostReactor();
         if (volumeIo->IsPollingNecessary())
         {
             ioContext.needPollingCount--;
@@ -306,23 +305,32 @@ AIO::SubmitFlush(pos_io& posIo)
 void
 AIO::SubmitAsyncIO(VolumeIoSmartPtr volumeIo)
 {
-    uint32_t core = volumeIo->GetOriginCore();
+    //POS_TRACE_ERROR(1111, "aio submission core : {}", EventFrameworkApiSingleton::Instance()->GetCurrentReactor());
+    AffinityManager* affinityMgr = AffinityManagerSingleton::Instance();
     uint32_t arr_vol_id = volumeIo->GetVolumeId() + (volumeIo->GetArrayId() << 8);
     switch (volumeIo->dir)
     {
         case UbioDir::Write:
         {
+            static std::atomic<uint64_t> phase;
+            uint32_t core = affinityMgr->GetIoReactor(phase);
             airlog("PERF_ARR_VOL", "write", arr_vol_id, volumeIo->GetSize());
-            SpdkEventScheduler::ExecuteOrScheduleEvent(core,
-                std::make_shared<WriteSubmission>(volumeIo));
+            volumeIo->SetOriginCore(core);
+            EventSmartPtr ptr = std::make_shared<WriteSubmission>(volumeIo);
+            SpdkEventScheduler::SendSpdkEvent(core, ptr);
+            phase = (phase + 1) % affinityMgr->GetIoReactorCount();
         }
         break;
 
         case UbioDir::Read:
         {
+            static std::atomic<uint64_t> phase;
+            uint32_t core = affinityMgr->GetIoReactor(phase);
             airlog("PERF_ARR_VOL", "read", arr_vol_id, volumeIo->GetSize());
-            SpdkEventScheduler::ExecuteOrScheduleEvent(core,
-                std::make_shared<ReadSubmission>(volumeIo));
+            volumeIo->SetOriginCore(core);
+            EventSmartPtr ptr = std::make_shared<ReadSubmission>(volumeIo);
+            SpdkEventScheduler::SendSpdkEvent(core, ptr);
+            phase = (phase + 1) % affinityMgr->GetIoReactorCount();
         }
         break;
 
